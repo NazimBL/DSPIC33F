@@ -1,0 +1,97 @@
+#include "xc.h"
+
+_FOSCSEL(FNOSC_FRC);
+_FOSC(FCKSM_CSECMD & OSCIOFNC_OFF);
+
+#define FCY 40000000
+#define LED	LATBbits.LATB10
+int ADCValue=0;
+
+int main(void) {
+    
+SetupOSC();
+ADC_Setup();
+Timer_Setup();
+
+//LED
+TRISBbits.TRISB10=0;
+
+LED=0;
+while (1) // repeat continuously
+{
+      
+  
+}
+  
+    return 0;
+}
+
+
+void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
+{
+  
+IFS0bits.T3IF = 0; // Clear Timer3 Interrupt Flag
+ADC_Read(); 
+
+}
+void SetupOSC(){
+  
+ //FCY = 40 Mhz   
+PLLFBD = 41;// M = 40
+CLKDIVbits.PLLPOST = 0; // N1 = 2
+CLKDIVbits.PLLPRE = 0; // N2 = 2
+
+__builtin_write_OSCCONH(0x03);
+__builtin_write_OSCCONL(0x01);
+
+// Wait for clock switch to occur
+while (OSCCONbits.COSC != 0b011);
+while(OSCCONbits.LOCK !=1); // Wait for PLL to lock
+
+}
+
+void ADC_Setup(){
+
+ //set A0 to input
+ TRISAbits.TRISA0=1;    
+ AD1PCFGL = 0xFFFE;// all PORTA = Digital; RA0 = analog
+ //10 bit
+ AD1CON1 = 0x00E0; 
+ //12 bit
+ //AD1CON1 = 0x04E0; 
+ 
+ AD1CHS0= 0x0000; // Connect RA0/AN0 as CH0 input ..
+ 
+ AD1CSSL = 0;
+ AD1CON3 = 0x1F02; // Tsampling
+ AD1CON2 = 0;
+ AD1CON1bits.ADON = 1; // turn ADC ON
+ 
+}
+
+void ADC_Read(){
+
+ AD1CON1bits.SAMP = 1;
+ while (!AD1CON1bits.DONE);// conversion done?
+ ADCValue = ADC1BUF0; 
+ 
+ if(ADCValue>500)LED=1;
+ else LED=0;
+ 
+}
+
+void Timer_Setup(){
+
+//5 khz interupt timer ( sampling frequency ) 
+T3CONbits.TON = 0; // Disable Timer
+T3CONbits.TCS = 0; // Select internal instruction cycle clock
+T3CONbits.TGATE = 0; // Disable Gated Timer mode
+T3CONbits.TCKPS = 0b00; // Select 1:1 Prescaler
+TMR3 = 0x00; // Clear timer register
+PR3 = 7000; // Load the period value
+//IPC0bits.T3IP = 0x01; // Set Timer1 Interrupt Priority Level
+IFS0bits.T3IF = 0; // Clear Timer1 Interrupt Flag
+IEC0bits.T3IE = 1; // Enable Timer1 interrupt
+T3CONbits.TON = 1;
+
+}
