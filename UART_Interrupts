@@ -1,0 +1,36 @@
+void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
+{
+  
+IFS0bits.T3IF = 0; // Clear Timer3 Interrupt Flag
+ADC_Read(); 
+
+}
+
+
+
+void __attribute__((__interrupt__, no_auto_psv)) _U1TXInterrupt(void)
+{ 
+    
+    IFS0bits.U1TXIF = 0; // clear TX interrupt flag
+    U1TXREG = ReceivedChar; // Transmit one character
+    
+
+}
+
+
+void __attribute__((interrupt, auto_psv)) _U1RXInterrupt( void )               
+{
+   
+    if(U1STAbits.FERR == 1)
+        {
+        ReceivedChar='0';
+        }     
+    
+    if ( U1STAbits.OERR == 1 )
+        {
+        U1STAbits.OERR = 0;
+        }
+    ReceivedChar = (char)U1RXREG;
+    IFS0bits.U1RXIF = 0;
+    
+}
