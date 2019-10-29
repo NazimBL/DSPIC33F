@@ -1,7 +1,6 @@
 /*
- * File:   main.c
- * Author: DELL
- *
+ * MPLAB X IDE
+ * Author: Nazim BL
  * Created on 1 juillet 2018, 10:10
  */
 
@@ -21,7 +20,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
   
 IFS0bits.T3IF = 0; 
 LED=!LED;
-//ADC_Read(); 
+//ADC_Read(); to read adc input at a set frequency
 }
 
 void main(void) {
@@ -36,7 +35,6 @@ LED=0;
 while (1);
 }
 
-
 void Timer_Setup(){
 
 T3CONbits.TON = 0; // Disable Timer
@@ -49,7 +47,6 @@ PR3 = 56000; // Load the period value
 IFS0bits.T3IF = 0; // Clear Timer1 Interrupt Flag
 IEC0bits.T3IE = 1; // Enable Timer1 interrupt
 T3CONbits.TON = 1;
-
 }
 
 
