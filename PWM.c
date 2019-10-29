@@ -1,13 +1,12 @@
 /*
- * File:   main.c
+ * MPLAB X IDE
  * Author: Nazim
- *
  * Created on 18 juin 2018, 11:58
  */
+
 #include <p33fj32mc204.h>
 #include "xc.h"
 #include <libpic30.h> 
-
 
 _FOSCSEL(FNOSC_FRCPLL);			// Start with FRC will switch to Primary (XT, HS, EC) Oscillator with PLL
 _FOSC(FCKSM_CSDCMD & POSCMD_NONE);	// Clock Switching disabled 
@@ -17,7 +16,6 @@ _FGS (GSS_OFF & GCP_OFF & GWRP_OFF);
 _FPOR (PWMPIN_ON & HPOL_ON & LPOL_ON & FPWRT_PWR128);
 _FICD (ICS_PGD1 & JTAGEN_OFF);
 
-//#define FCY 39680028
 #define FCY 40000000
 
 void PWM_Init()
@@ -45,7 +43,6 @@ void PWM_Init()
  
     DTCON1bits.DTAPS = 0;  //DeadTime pre-scaler
     DTCON1bits.DTA = 59;   //DeadTime value for 4 us. 
- 
 
     PDC1 = 19999; // PWM#1 Duty Cycle register (11-bit)
     PDC2 = 19999; // PWM#2 Duty Cycle register (11-bit)
@@ -57,19 +54,17 @@ void PWM_Init()
 void OSC_Init(){
 	
     PLLFBD =  33;		        // M=45
-	CLKDIVbits.PLLPOST = 0;		// N1=2
-	CLKDIVbits.PLLPRE = 0;		// N2=2
-
-   // OSCCONbits.OSWEN=1;
-	while (OSCCONbits.COSC != 0b001);
+    CLKDIVbits.PLLPOST = 0;		// N1=2
+    CLKDIVbits.PLLPRE = 0;		// N2=2
+    // OSCCONbits.OSWEN=1;
+    while (OSCCONbits.COSC != 0b001);
     while(OSCCONbits.LOCK!=1);
 } 
    
 void main(void) {
     
    OSC_Init();
-   PWM_Init();
+   PWM_Init();  
    
-    while(1);
-       
+   while(1);       
 }
