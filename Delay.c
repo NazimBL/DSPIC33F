@@ -1,30 +1,25 @@
 #include "xc.h"
-#include "MyUart.h"
 
 _FOSCSEL(FNOSC_FRC);
 _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF);
 
+//define operating frequency and LED pin on B10
 #define FCY 40000000
 #define LED	LATBbits.LATB10
 
 void SetupOSC();
 void myDelay();
 
-int main(void) {
+void main(void) {
     
 SetupOSC();
-//LED
 TRISBbits.TRISB10=0;
 
 while (1) // repeat continuously
-{
-    
+{    
     LED=~LED;
     myDelay();
-  
 }
-  
-    return 0;
 }
 
 void myDelay(){
@@ -40,6 +35,5 @@ IFS0bits.T3IF = 0; // Clear Timer1 Interrupt Flag
 IEC0bits.T3IE = 1; // Enable Timer1 interrupt
 T3CONbits.TON = 1;
 while(IFS0bits.T3IF == 0); 
-IFS0bits.T3IF = 0; 
-    
+IFS0bits.T3IF = 0;     
 }
